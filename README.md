@@ -11,7 +11,14 @@ OPTIONS
 -n, --sobject                     The name of the object
 -f, --field                       The name of the field
 
+EXAMPLES
+Show a list of field names, api names, types and lengths on the Account sobject:
 
+  $ sfdx potter:schema:fields --sobject Account 
+
+Show all the information for the Account.Name field
+
+  $ sfdx potter:schema:fields --sobject Account --field Name
 
 
 ```

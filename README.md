@@ -10,15 +10,21 @@ $ sfdx potter:schema:fields --sobject Account --field Name
 OPTIONS
 -n, --sobject                     The name of the object
 -f, --field                       The name of the field
+-s, --sortby                      The name of the field to sort the details by. Defaults to Name
 
 EXAMPLES
-Show a list of field names, api names, types and lengths on the Account sobject:
+$ sfdx potter:schema:fields --sobject Account 
+  Show a list of field names, api names, types and lengths on the Account sobject
 
-  $ sfdx potter:schema:fields --sobject Account 
+$ sfdx potter:schema:fields --sobject Account --field Name
+  Show all the information for the Account.Name field
 
-Show all the information for the Account.Name field
+$ sfdx potter:schema:fields --sobject Account --sortby label 
+  Show a list of fields for the Account object and sort the results by label
 
-  $ sfdx potter:schema:fields --sobject Account --field Name
+$ sfdx potter:schema:fields --sobject Account --sortby type
+  Show a list of fields for the Account object and sort the results by type
+
 
 
 ```

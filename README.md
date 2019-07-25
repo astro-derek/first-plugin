@@ -3,6 +3,21 @@ first-plugin
 
 First plugin to test
 
+```
+USAGE
+$ sfdx potter:schema:fields --sobject Account --field Name
+
+OPTIONS
+-n, --sobject                     The name of the object
+-f, --field                       The name of the field
+
+
+
+
+
+
+
+
 [![Version](https://img.shields.io/npm/v/first-plugin.svg)](https://npmjs.org/package/first-plugin)
 [![CircleCI](https://circleci.com/gh/dpotter1/first-plugin/tree/master.svg?style=shield)](https://circleci.com/gh/dpotter1/first-plugin/tree/master)
 [![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/dpotter1/first-plugin?branch=master&svg=true)](https://ci.appveyor.com/project/heroku/first-plugin/branch/master)

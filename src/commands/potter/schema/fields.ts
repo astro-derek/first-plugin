@@ -6,19 +6,24 @@ export default class Fields extends SfdxCommand {
     public static description = 'List field information for an object - useful to quickly view the field names in readable format';
 
     public static examples = [
-        `$ sfdx potter:schema:fields --objectname Account`
+        `$ sfdx potter:schema:fields --sobject Account`
     ];
 
     protected static flagsConfig: FlagsConfig = {
         help: flags.help({ char: 'h' }),
-        objectname : flags.string({
+        sobject : flags.string({
             char: 'n',
-            description: 'object name to list fields for',
+            description: 'sobject name to list fields for',
             required: true
         }),
-        fieldname : flags.string({
+        field : flags.string({
             char: 'f',
             description: 'field name to list specific field details',
+            required: false
+        }),
+        sortby : flags.string({
+            char: 's',
+            description: 'sortby label or api. Defaults to api.',
             required: false
         })
     }
@@ -27,8 +32,9 @@ export default class Fields extends SfdxCommand {
 
     public async run(): Promise<any> {
         const apiversion = await this.org.getConnection().retrieveMaxApiVersion();
-        const objectName: string = this.flags.objectname;
-        const fieldName: string = this.flags.fieldname;
+        const objectName: string = this.flags.sobject;
+        const fieldName: string = this.flags.field;
+        const sortBy: string = this.flags.sortby ? this.flags.sortby : 'name';
 
         this.ux.log("/services/data/v" + apiversion + "/sobjects/" + objectName + "/describe/");
 
@@ -46,10 +52,10 @@ export default class Fields extends SfdxCommand {
         const lengthHeader: string = 'Length'.padEnd(50);
 
         if (response["fields"] && !fieldName) {
-            this.ux.log(`Field details for ${objectName}. ${response['fields'].length} fields`);
+            this.ux.log(`Field details for ${objectName}. ${response['fields'].length} fields sorted by ${sortBy}`);
             this.ux.log(`${labelHeader} ${nameHeader} ${typeHeader} ${lengthHeader}`);
 
-            const sorted = response["fields"].sort((a, b) => a["name"].localeCompare(b["name"]));
+            let sorted = response["fields"].sort((a, b) => a[sortBy].localeCompare(b[sortBy]));
 
             sorted.forEach(field => {
                 const labelValue: string = field.label.padEnd(50);

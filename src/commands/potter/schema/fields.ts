@@ -55,7 +55,7 @@ export default class Fields extends SfdxCommand {
             this.ux.log(`Field details for ${objectName}. ${response['fields'].length} fields sorted by ${sortBy}`);
             this.ux.log(`${labelHeader} ${nameHeader} ${typeHeader} ${lengthHeader}`);
 
-            let sorted = response["fields"].sort((a, b) => a[sortBy].localeCompare(b[sortBy]));
+            const sorted = response["fields"].sort((a, b) => a[sortBy].localeCompare(b[sortBy]));
 
             sorted.forEach(field => {
                 const labelValue: string = field.label.padEnd(50);

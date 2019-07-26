@@ -1,6 +1,4 @@
-import { join, dirname } from 'path';
-import { SfdxCommand, core, flags, FlagsConfig } from '@salesforce/command';
-import { request } from 'http';
+import { SfdxCommand, flags, FlagsConfig } from '@salesforce/command';
 import { Constants } from '../../../constants';
 
 export default class Fields extends SfdxCommand {
@@ -25,19 +23,17 @@ export default class Fields extends SfdxCommand {
         sortby : flags.string({
             char: 's',
             description: 'sortby label or api. Defaults to api.',
-            required: false
+            required: false,
+            default: 'name'
         })
     }
-
+    
     protected static requiresUsername = true;
 
     public async run(): Promise<any> {
         const apiversion = await this.org.getConnection().retrieveMaxApiVersion();
-        const objectName: string = this.flags.sobject;
-        const fieldName: string = this.flags.field;
-        const sortBy: string = this.flags.sortby ? this.flags.sortby : 'name';
-
-        const url = Constants.REST_API_ENDPOINT_PREFIX + apiversion + Constants.SOBJECTS_PATH + objectName + Constants.DESCRIBE_PATH;
+        
+        const url = Constants.REST_API_ENDPOINT_PREFIX + apiversion + Constants.SOBJECTS_PATH + this.flags.sobject + Constants.DESCRIBE_PATH;
 
         let response = await this.org.getConnection().request({
             method: Constants.REST_METHOD_GET,
@@ -45,29 +41,26 @@ export default class Fields extends SfdxCommand {
             url: url
         });
 
-        const labelHeader: string = 'Label'.padEnd(50);
-        const nameHeader: string = 'Name'.padEnd(50);
-        const typeHeader: string = 'Type'.padEnd(25);
-        const lengthHeader: string = 'Length'.padEnd(50);
+        let data = [];
 
-        if (response["fields"] && !fieldName) {
-            this.ux.log(`Field details for ${objectName}. ${response['fields'].length} fields sorted by ${sortBy}`);
-            this.ux.log(`${labelHeader} ${nameHeader} ${typeHeader} ${lengthHeader}`);
-
-            const sorted = response["fields"].sort((a, b) => a[sortBy].localeCompare(b[sortBy]));
+        if (response["fields"] && !this.flags.field) {
+            const sorted = response["fields"].sort((a, b) => a[this.flags.sortby].localeCompare(b[this.flags.sortby]));
 
             sorted.forEach(field => {
-                const labelValue: string = field.label.padEnd(50);
-                const nameValue: string = field.name.padEnd(50);
-                const typeValue: string = field.type.padEnd(25);
-                
-                this.ux.log(`${labelValue} ${nameValue} ${typeValue} ${field.length}`);
+                data.push({
+                    label: field.label,
+                    name: field.name,
+                    type: field.type,
+                    length: field.length
+                })
             });
         }
 
-        if (response["fields"] && fieldName) {
+        this.ux.table(data, ['label', 'name', 'type', 'length']);
+
+        if (response["fields"] && this.flags.field) {
             response["fields"].forEach(field => {
-                if (field["name"].toUpperCase() === fieldName.toUpperCase()) {
+                if (field["name"].toUpperCase() === this.flags.field.toUpperCase()) {
                     this.ux.log(JSON.stringify(field, null, 3));
                 }
             })

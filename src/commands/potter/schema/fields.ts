@@ -33,37 +33,54 @@ export default class Fields extends SfdxCommand {
     public async run(): Promise<any> {
         const apiversion = await this.org.getConnection().retrieveMaxApiVersion();
         
-        let response = await this.org.getConnection().request({
+        const response = await this.callDescribe(apiversion, this.flags.sobject);
+
+        this.output(response);
+        
+        return response
+    }
+
+    private callDescribe(apiversion, sobject) {
+        return this.org.getConnection().request({
             method: Constants.REST_METHOD_GET,
             headers: Constants.CONTENT_TYPE_APPLICATION_JSON,
-            url: Constants.REST_API_ENDPOINT_PREFIX + apiversion + Constants.SOBJECTS_PATH + this.flags.sobject + Constants.DESCRIBE_PATH
+            url: Constants.REST_API_ENDPOINT_PREFIX + apiversion + Constants.SOBJECTS_PATH + sobject + Constants.DESCRIBE_PATH
         });
-
+    }
+    private output(response) {
         if (response["fields"] && !this.flags.field) {
-            const sorted = response["fields"].sort((a, b) => a[this.flags.sortby].localeCompare(b[this.flags.sortby]));
-            let data = [];
-
-            sorted.forEach(field => {
-                data.push({
-                    label: field.label,
-                    name: field.name,
-                    type: field.type,
-                    length: field.length
-                })
-            });
-
-            this.ux.table(data, ['label', 'name', 'type', 'length']);
+            this.outputFieldList(this.sort(response));
         }
 
         if (response["fields"] && this.flags.field) {
-            response["fields"].forEach(field => {
-                if (field["name"].toUpperCase() === this.flags.field.toUpperCase()) {
-                    this.ux.log(JSON.stringify(field, null, 3));
-                }
-            })
+            this.outputFieldDetail(response, this.flags.field);
         }
-        
-        return response;
+    }
 
+    private sort(response) {
+        return response["fields"].sort((a, b) => a[this.flags.sortby].localeCompare(b[this.flags.sortby]));
+    }
+
+    private outputFieldList(sorted) {
+        let data = [];
+
+        sorted.forEach(field => {
+            data.push({
+                label: field.label,
+                name: field.name,
+                type: field.type,
+                length: field.length
+            })
+        });
+
+        this.ux.table(data, ['label', 'name', 'type', 'length']);
+    }
+
+    private outputFieldDetail(response, field) {
+        response["fields"].forEach(field => {
+            if (field["name"].toUpperCase() === this.flags.field.toUpperCase()) {
+                this.ux.log(JSON.stringify(field, null, 3));
+            }
+        })
     }
 }

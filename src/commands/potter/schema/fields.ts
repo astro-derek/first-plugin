@@ -41,10 +41,9 @@ export default class Fields extends SfdxCommand {
             url: url
         });
 
-        let data = [];
-
         if (response["fields"] && !this.flags.field) {
             const sorted = response["fields"].sort((a, b) => a[this.flags.sortby].localeCompare(b[this.flags.sortby]));
+            let data = [];
 
             sorted.forEach(field => {
                 data.push({
@@ -54,9 +53,9 @@ export default class Fields extends SfdxCommand {
                     length: field.length
                 })
             });
-        }
 
-        this.ux.table(data, ['label', 'name', 'type', 'length']);
+            this.ux.table(data, ['label', 'name', 'type', 'length']);
+        }
 
         if (response["fields"] && this.flags.field) {
             response["fields"].forEach(field => {

@@ -1,6 +1,7 @@
 import { join, dirname } from 'path';
 import { SfdxCommand, core, flags, FlagsConfig } from '@salesforce/command';
 import { request } from 'http';
+import { Constants } from '../../../constants';
 
 export default class Fields extends SfdxCommand {
     public static description = 'List field information for an object - useful to quickly view the field names in readable format';
@@ -36,14 +37,12 @@ export default class Fields extends SfdxCommand {
         const fieldName: string = this.flags.field;
         const sortBy: string = this.flags.sortby ? this.flags.sortby : 'name';
 
-        this.ux.log("/services/data/v" + apiversion + "/sobjects/" + objectName + "/describe/");
+        const url = Constants.REST_API_ENDPOINT_PREFIX + apiversion + Constants.SOBJECTS_PATH + objectName + Constants.DESCRIBE_PATH;
 
         let response = await this.org.getConnection().request({
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            url: "/services/data/v" + apiversion + "/sobjects/" + objectName + "/describe/"
+            method: Constants.REST_METHOD_GET,
+            headers: Constants.CONTENT_TYPE_APPLICATION_JSON,
+            url: url
         });
 
         const labelHeader: string = 'Label'.padEnd(50);

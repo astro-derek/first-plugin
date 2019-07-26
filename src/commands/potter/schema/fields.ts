@@ -33,12 +33,10 @@ export default class Fields extends SfdxCommand {
     public async run(): Promise<any> {
         const apiversion = await this.org.getConnection().retrieveMaxApiVersion();
         
-        const url = Constants.REST_API_ENDPOINT_PREFIX + apiversion + Constants.SOBJECTS_PATH + this.flags.sobject + Constants.DESCRIBE_PATH;
-
         let response = await this.org.getConnection().request({
             method: Constants.REST_METHOD_GET,
             headers: Constants.CONTENT_TYPE_APPLICATION_JSON,
-            url: url
+            url: Constants.REST_API_ENDPOINT_PREFIX + apiversion + Constants.SOBJECTS_PATH + this.flags.sobject + Constants.DESCRIBE_PATH
         });
 
         if (response["fields"] && !this.flags.field) {

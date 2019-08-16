@@ -68,12 +68,13 @@ export default class Fields extends SfdxCommand {
             data.push({
                 label: field.label,
                 name: field.name,
+                relationshipName: field.relationshipName,
                 type: field.type,
                 length: field.length
             })
         });
 
-        this.ux.table(data, ['label', 'name', 'type', 'length']);
+        this.ux.table(data, ['label', 'name', 'relationshipName', 'type', 'length']);
     }
 
     private outputFieldDetail(response, field) {
